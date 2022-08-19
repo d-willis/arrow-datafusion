@@ -26,7 +26,7 @@ use arrow::compute;
 use arrow::datatypes::{DataType, TimeUnit};
 use arrow::{
     array::{
-        ArrayRef, BasicDecimalArray, Date32Array, Date64Array, Float32Array,
+        ArrayRef, Date32Array, Date64Array, Float32Array,
         Float64Array, Int16Array, Int32Array, Int64Array, Int8Array, LargeStringArray,
         StringArray, Time64NanosecondArray, TimestampMicrosecondArray,
         TimestampMillisecondArray, TimestampNanosecondArray, TimestampSecondArray,
