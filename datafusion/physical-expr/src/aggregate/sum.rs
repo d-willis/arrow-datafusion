@@ -154,8 +154,8 @@ macro_rules! typed_sum_delta_batch {
 // https://github.com/apache/arrow-rs/issues/1010
 fn sum_decimal_batch(
     values: &ArrayRef,
-    precision: &usize,
-    scale: &usize,
+    precision: &u8,
+    scale: &u8,
 ) -> Result<ScalarValue> {
     let array = values.as_any().downcast_ref::<Decimal128Array>().unwrap();
 
@@ -226,8 +226,8 @@ macro_rules! sum_row {
 fn sum_decimal(
     lhs: &Option<i128>,
     rhs: &Option<i128>,
-    precision: &usize,
-    scale: &usize,
+    precision: &u8,
+    scale: &u8,
 ) -> ScalarValue {
     match (lhs, rhs) {
         (None, None) => ScalarValue::Decimal128(None, *precision, *scale),
@@ -242,9 +242,9 @@ fn sum_decimal(
 fn sum_decimal_with_diff_scale(
     lhs: &Option<i128>,
     rhs: &Option<i128>,
-    precision: &usize,
-    lhs_scale: &usize,
-    rhs_scale: &usize,
+    precision: &u8,
+    lhs_scale: &u8,
+    rhs_scale: &u8,
 ) -> ScalarValue {
     // the lhs_scale must be greater or equal rhs_scale.
     match (lhs, rhs) {

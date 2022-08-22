@@ -70,7 +70,22 @@ fn array_array(args: &[ArrayRef]) -> Result<ArrayRef> {
     let res = match args[0].data_type() {
         DataType::Utf8 => array!(args, StringArray, StringBuilder),
         DataType::LargeUtf8 => array!(args, LargeStringArray, LargeStringBuilder),
-        DataType::Boolean => array!(args, BooleanArray, BooleanBuilder),
+        DataType::Boolean => {
+            let args = downcast_vec!(args, BooleanArray).collect::<Result<Vec<&BooleanArray>>>().unwrap();
+            let mut builder =
+                FixedSizeListBuilder::new(BooleanBuilder::new(), args.len() as i32);
+            for index in 0..args[0].len() {
+                for arg in &args {
+                    if arg.is_null(index) {
+                        builder.values().append_null();
+                    } else {
+                        builder.values().append_value(arg.value(index));
+                    }
+                }
+                builder.append(true);
+            }
+            Arc::new(builder.finish())
+        }
         DataType::Float32 => array!(args, Float32Array, Float32Builder),
         DataType::Float64 => array!(args, Float64Array, Float64Builder),
         DataType::Int8 => array!(args, Int8Array, Int8Builder),

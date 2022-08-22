@@ -52,7 +52,7 @@ pub enum ScalarValue {
     /// 64bit float
     Float64(Option<f64>),
     /// 128bit decimal, using the i128 to represent the decimal
-    Decimal128(Option<i128>, usize, usize),
+    Decimal128(Option<i128>, u8, u8),
     /// signed 8bit int
     Int8(Option<i8>),
     /// signed 16bit int
@@ -612,11 +612,7 @@ macro_rules! eq_array_primitive {
 
 impl ScalarValue {
     /// Create a decimal Scalar from value/precision and scale.
-    pub fn try_new_decimal128(
-        value: i128,
-        precision: usize,
-        scale: usize,
-    ) -> Result<Self> {
+    pub fn try_new_decimal128(value: i128, precision: u8, scale: u8) -> Result<Self> {
         // make sure the precision and scale is valid
         if precision <= DECIMAL128_MAX_PRECISION && scale <= precision {
             return Ok(ScalarValue::Decimal128(Some(value), precision, scale));
@@ -1155,8 +1151,8 @@ impl ScalarValue {
 
     fn iter_to_decimal_array(
         scalars: impl IntoIterator<Item = ScalarValue>,
-        precision: &usize,
-        scale: &usize,
+        precision: &u8,
+        scale: &u8,
     ) -> Result<Decimal128Array> {
         let array = scalars
             .into_iter()
@@ -1232,8 +1228,8 @@ impl ScalarValue {
 
     fn build_decimal_array(
         value: &Option<i128>,
-        precision: &usize,
-        scale: &usize,
+        precision: &u8,
+        scale: &u8,
         size: usize,
     ) -> Decimal128Array {
         std::iter::repeat(*value)
@@ -1340,7 +1336,23 @@ impl ScalarValue {
                 ),
             },
             ScalarValue::List(values, field) => Arc::new(match field.data_type() {
-                DataType::Boolean => build_list!(BooleanBuilder, Boolean, values, size),
+                DataType::Boolean => {
+                    let mut builder = ListBuilder::new(BooleanBuilder::new());
+                    match values{
+                        Some(values) => {
+                            for val in values {
+                                if let ScalarValue::Boolean(opt_bool) = val {
+                                    match opt_bool {
+                                        Some(bool_val) => builder.values().append_value(*bool_val),
+                                        None => builder.values().append_null(),
+                                    };
+                                }
+                            }
+                        }
+                        None => (),
+                    };
+                    builder.finish()
+                }
                 DataType::Int8 => build_list!(Int8Builder, Int8, values, size),
                 DataType::Int16 => build_list!(Int16Builder, Int16, values, size),
                 DataType::Int32 => build_list!(Int32Builder, Int32, values, size),
@@ -1450,8 +1462,8 @@ impl ScalarValue {
     fn get_decimal_value_from_array(
         array: &ArrayRef,
         index: usize,
-        precision: &usize,
-        scale: &usize,
+        precision: &u8,
+        scale: &u8,
     ) -> ScalarValue {
         let array = array.as_any().downcast_ref::<Decimal128Array>().unwrap();
         if array.is_null(index) {
@@ -1635,8 +1647,8 @@ impl ScalarValue {
         array: &ArrayRef,
         index: usize,
         value: &Option<i128>,
-        precision: usize,
-        scale: usize,
+        precision: u8,
+        scale: u8,
     ) -> bool {
         let array = array.as_any().downcast_ref::<Decimal128Array>().unwrap();
         if array.precision() != precision || array.scale() != scale {
