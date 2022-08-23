@@ -29,7 +29,7 @@ rust-version = "1.62"
 readme = "README.md"
 
 [dependencies]
-arrow = { git = "https://github.com/d-willis/arrow-rs", branch = "master" }
+arrow = { git = "https://github.com/d-willis/arrow-rs", rev = "b2f0c65" }
 clap = { version = "3", features = ["derive", "cargo"] }
 datafusion = { path = "../datafusion/core", version = "11.0.0" }
 dirs = "4.0.0"

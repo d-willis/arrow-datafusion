@@ -37,7 +37,7 @@ default = ["unicode_expressions"]
 unicode_expressions = []
 
 [dependencies]
-arrow = { git = "https://github.com/d-willis/arrow-rs", branch = "master", features = ["prettyprint"] }
+arrow = { git = "https://github.com/d-willis/arrow-rs", rev = "b2f0c65", features = ["prettyprint"] }
 async-trait = "0.1.41"
 chrono = { version = "0.4", default-features = false }
 datafusion-common = { path = "../common", version = "11.0.0" }
