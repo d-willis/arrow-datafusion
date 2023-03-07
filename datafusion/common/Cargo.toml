@@ -47,4 +47,4 @@ ordered-float = "3.0"
 parquet = { git = "https://github.com/d-willis/arrow-rs", rev = "b2f0c65", features = ["arrow"], optional = true }
 pyo3 = { version = "0.16", optional = true }
 serde_json = "1.0"
-sqlparser = "0.21"
+sqlparser = "0.32"
