@@ -38,7 +38,7 @@ jit = []
 [dependencies]
 arrow = { git = "https://github.com/d-willis/arrow-rs", rev = "b2f0c65" }
 cranelift = "0.86.1"
-cranelift-jit = "0.86.1"
+cranelift-jit = "0.93.1"
 cranelift-module = "0.86.1"
 cranelift-native = "0.86.1"
 datafusion-common = { path = "../common", version = "11.0.0", features = ["jit"] }
